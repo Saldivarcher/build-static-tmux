@@ -49,13 +49,11 @@ jobs:
       # Do the upload step
       - name: Upload artifacts
         if: startsWith(github.ref, 'refs/tags/')
-        uses: ncipollo/release-action@v1
+        uses: actions/upload-artifact@v2
         with:
-          artifacts: "/tmp/tmux-static/bin/tmux.*.gz"
-          replacesArtifacts: true
-          allowUpdates: true
-          bodyFile: "README.md"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          name: tmux-linux-x86
+          path: |
+            /tmp/tmux-static/bin/tmux.*.gz
 
   # This workflow contains a single job called "build"
   build_aarch64:
@@ -91,10 +89,8 @@ jobs:
       # Do the upload step
       - name: Upload artifacts
         if: startsWith(github.ref, 'refs/tags/')
-        uses: ncipollo/release-action@v1
+        uses: actions/upload-artifact@v2
         with:
-          artifacts: "/tmp/tmux-static/bin/tmux.*.gz"
-          replacesArtifacts: true
-          allowUpdates: true
-          bodyFile: "README.md"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          name: tmux-linux-aarch64
+          path: |
+            /tmp/tmux-static/bin/tmux.*.gz
