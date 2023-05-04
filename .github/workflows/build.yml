@@ -80,7 +80,7 @@ jobs:
           distro: ubuntu_latest
           githubToken: ${{ github.token }}
           dockerRunArgs: |
-            --volume "${PWD}:/workspace"
+            --volume "/tmp:/tmp"
           install: |
             apt-get -y update
             apt-get -y install build-essential wget
