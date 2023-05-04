@@ -3,29 +3,94 @@ name: Build artifact
 
 # Controls when the action will run. 
 on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
   release:
-    types: [published]
+    types: [created]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  BUILDCACHE_DIR: ${{github.workspace}}/.buildcache
+  BUILDCACHE_VERSION: v0.27.0
+  BUILDCACHE_ACCURACY: STRICT
+  BUILDCACHE_MAX_CACHE_SIZE: 1073741824 # 1GiB
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
+  build_x86:
     # The type of runner that the job will run on
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
+    name: Build on ubuntu-latest x86-64
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      # Do the build step
-      - name: run the buildscript
+      - name: Install dependencies
+        run: |
+          sudo apt-get -y update
+          sudo apt-get -y install build-essential wget
+
+      - name: Restore buildcache
+        uses: actions/cache@v2
+        with:
+          path: ${{env.BUILDCACHE_DIR}}
+          key: buildcache-ubuntu-latest-x86_64
+
+      - name: Build tmux
+        id: build
         run: /bin/sh build-static-tmux.sh
+
       # Do the upload step
       - name: Upload artifacts
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "/tmp/tmux-static/bin/tmux.*.gz"
+          replacesArtifacts: true
+          allowUpdates: true
+          bodyFile: "README.md"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  # This workflow contains a single job called "build"
+  build_aarch64:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    name: Build on ubuntu-latest aarch64
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - name: Restore buildcache
+        uses: actions/cache@v2
+        with:
+          path: ${{env.BUILDCACHE_DIR}}
+          key: buildcache-ubuntu-latest-aarch64
+
+      - uses: uraimo/run-on-arch-action@v2
+        name: Build tmux
+        id: build
+        with:
+          arch: aarch64
+          distro: ubuntu_latest
+          githubToken: ${{ github.token }}
+          dockerRunArgs: |
+            --volume "${PWD}:/workspace"
+          install: |
+            apt-get -y update
+            apt-get -y install build-essential wget
+          run: /bin/sh build-static-tmux.sh
+
+      # Do the upload step
+      - name: Upload artifacts
+        #if: startsWith(github.ref, 'refs/tags/')
         uses: ncipollo/release-action@v1
         with:
           artifacts: "/tmp/tmux-static/bin/tmux.*.gz"
