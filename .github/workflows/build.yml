@@ -55,6 +55,13 @@ jobs:
           path: |
             /tmp/tmux-static/bin/tmux.*.gz
 
+      - name: Upload assets
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            /tmp/tmux-static/bin/*.gz
+
   # This workflow contains a single job called "build"
   build_aarch64:
     # The type of runner that the job will run on
@@ -95,40 +102,9 @@ jobs:
           path: |
             /tmp/tmux-static/bin/tmux.*.gz
 
-  publish:
-    needs: [build_x86, build_aarch64]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        arch:
-          - aarch64
-          - x86
-
-    steps:
-    - name: Download Artifact
-      uses: actions/download-artifact@v2
-      with:
-        name: tmux-linux-${{ matrix.arch }}
-        path: build
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        body: |
-          Release of tmux-linux-${{ matrix.arch }}
-
-    - name: Upload Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./build/tmux-linux-${{matrix.arch}}
-        asset_name: tmux-linux-${{ matrix.arch }}
-        asset_content_type: application/octet-stream
-
+      - name: Upload assets
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            /tmp/tmux-static/bin/*.gz
