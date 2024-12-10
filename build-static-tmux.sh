@@ -46,7 +46,7 @@ TMUX_BIN="tmux.${OS}-${ARCH}"
 ######################################
 TMUX_VERSION=3.5a
 MUSL_VERSION=1.2.5
-NCURSES_VERSION=6.5
+NCURSES_VERSION=6.3
 LIBEVENT_VERSION=2.1.12
 UPX_VERSION=4.2.4
 ######################################
