@@ -393,6 +393,7 @@ sed -i 's|#include <sys/queue.h>||g' file.c
 
 printf "Compiling....."
 make >> ${LOG_DIR}/${LOG_FILE} 2>&1
+cat /tmp/tmux-static/log/tmux-3.5a.log
 checkResult $?
 
 printf "Installing...."
