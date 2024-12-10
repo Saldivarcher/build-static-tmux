@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -x
+
 export CC=cc
 export REALCC=${CC}
 export CPPFLAGS="-P"
