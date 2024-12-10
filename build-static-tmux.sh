@@ -353,6 +353,8 @@ printf "Installing...."
 make install >> ${LOG_DIR}/${LOG_FILE} 2>&1
 checkResult $?
 
+make clean; make; make install
+
 ###############################################################
 echo ""
 echo "tmux ${TMUX_VERSION}"

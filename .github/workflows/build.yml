@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get -y update
-          sudo apt-get -y install build-essential wget libgsl-dev
+          sudo apt-get -y install build-essential wget
 
       - name: Restore buildcache
         uses: actions/cache@v2
